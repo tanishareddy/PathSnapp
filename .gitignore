@@ -1,0 +1,9 @@
+*.zip
+Student_folder/
+PathSnap_student_materials/
+all_pdfs_clean.txt
+pdf_extracted_text.txt
+data/*.npz
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

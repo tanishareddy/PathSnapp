@@ -1,0 +1,222 @@
+{
+  "best_trial_id": 11,
+  "best_cv_macro_f1": 0.8593893045735198,
+  "best_params": {
+    "max_iter": 100,
+    "max_depth": 9,
+    "learning_rate": 0.07386553898434063,
+    "min_samples_leaf": 50,
+    "l2_regularization": 0.00011290683633792072
+  },
+  "search_space": {
+    "max_iter": [
+      60,
+      160
+    ],
+    "max_depth": [
+      5,
+      12
+    ],
+    "learning_rate": [
+      0.03,
+      0.25
+    ],
+    "min_samples_leaf": [
+      10,
+      60
+    ],
+    "l2_regularization": [
+      0.0001,
+      10.0
+    ]
+  },
+  "num_trials": 15,
+  "optimization_time_sec": 61.2462215423584,
+  "tuned_train_time_sec": 1.8326611518859863,
+  "tuned_infer_time_sec": 0.680619478225708,
+  "tuned_test_top1_acc": 0.7388830897703549,
+  "tuned_test_macro_f1": 0.8829313818500386,
+  "tuned_log_loss": 0.10933540066536503,
+  "trials": [
+    {
+      "trial_id": 0,
+      "macro_f1": 0.8575407561512232,
+      "params": {
+        "max_iter": 100,
+        "max_depth": 12,
+        "learning_rate": 0.1416299181347598,
+        "min_samples_leaf": 40,
+        "l2_regularization": 0.0006026889128682511
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 1,
+      "macro_f1": 0.8576605359460948,
+      "params": {
+        "max_iter": 60,
+        "max_depth": 5,
+        "learning_rate": 0.188240251311105,
+        "min_samples_leaf": 40,
+        "l2_regularization": 0.3470266988650412
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 2,
+      "macro_f1": 0.8574830380077944,
+      "params": {
+        "max_iter": 60,
+        "max_depth": 12,
+        "learning_rate": 0.17524678121538595,
+        "min_samples_leaf": 20,
+        "l2_regularization": 0.0008111941985431928
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 3,
+      "macro_f1": 0.8583829556873989,
+      "params": {
+        "max_iter": 80,
+        "max_depth": 7,
+        "learning_rate": 0.09126974102262583,
+        "min_samples_leaf": 30,
+        "l2_regularization": 0.0028585493941961923
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 4,
+      "macro_f1": 0.8587382770542069,
+      "params": {
+        "max_iter": 120,
+        "max_depth": 6,
+        "learning_rate": 0.05573570847470415,
+        "min_samples_leaf": 30,
+        "l2_regularization": 0.019069966103000432
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 5,
+      "macro_f1": 0.8577024812963484,
+      "params": {
+        "max_iter": 140,
+        "max_depth": 6,
+        "learning_rate": 0.08925611292658313,
+        "min_samples_leaf": 40,
+        "l2_regularization": 0.00017070728830306665
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 6,
+      "macro_f1": 0.8565780200025884,
+      "params": {
+        "max_iter": 120,
+        "max_depth": 6,
+        "learning_rate": 0.034436736023813024,
+        "min_samples_leaf": 60,
+        "l2_regularization": 6.732248920775331
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 7,
+      "macro_f1": 0.8586497956814446,
+      "params": {
+        "max_iter": 140,
+        "max_depth": 7,
+        "learning_rate": 0.03690282120313641,
+        "min_samples_leaf": 50,
+        "l2_regularization": 0.015876781526923997
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 8,
+      "macro_f1": 0.8495430172578295,
+      "params": {
+        "max_iter": 60,
+        "max_depth": 8,
+        "learning_rate": 0.03226909977580951,
+        "min_samples_leaf": 60,
+        "l2_regularization": 0.0019674328025306126
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 9,
+      "macro_f1": 0.8587495583052931,
+      "params": {
+        "max_iter": 120,
+        "max_depth": 7,
+        "learning_rate": 0.09036695362400474,
+        "min_samples_leaf": 40,
+        "l2_regularization": 0.0008399864445957502
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 10,
+      "macro_f1": 0.8575007555243426,
+      "params": {
+        "max_iter": 160,
+        "max_depth": 10,
+        "learning_rate": 0.1471789452342084,
+        "min_samples_leaf": 40,
+        "l2_regularization": 0.002407141204965211
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 11,
+      "macro_f1": 0.8593893045735198,
+      "params": {
+        "max_iter": 100,
+        "max_depth": 9,
+        "learning_rate": 0.07386553898434063,
+        "min_samples_leaf": 50,
+        "l2_regularization": 0.00011290683633792072
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 12,
+      "macro_f1": 0.8583758771197382,
+      "params": {
+        "max_iter": 100,
+        "max_depth": 10,
+        "learning_rate": 0.0887970977717975,
+        "min_samples_leaf": 60,
+        "l2_regularization": 0.002683743084446033
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 13,
+      "macro_f1": 0.8592940822925614,
+      "params": {
+        "max_iter": 100,
+        "max_depth": 9,
+        "learning_rate": 0.08401528585696186,
+        "min_samples_leaf": 60,
+        "l2_regularization": 0.0001174632300122789
+      },
+      "state": "TrialState.COMPLETE"
+    },
+    {
+      "trial_id": 14,
+      "macro_f1": 0.8583938104928573,
+      "params": {
+        "max_iter": 80,
+        "max_depth": 8,
+        "learning_rate": 0.13989200623433362,
+        "min_samples_leaf": 60,
+        "l2_regularization": 0.00021955824194078957
+      },
+      "state": "TrialState.COMPLETE"
+    }
+  ]
+}
