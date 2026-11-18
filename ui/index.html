@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PathSnap - Evaluator Interface (Laptop 2)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+  
+  <!-- Top Navigation Bar -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+        <i class="ph ph-map-trifold text-2xl text-white"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-lg leading-tight tracking-wide text-white">PathSnap <span class="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 font-semibold border border-blue-500/30">Laptop 2 Evaluator UI (v2.0)</span></h1>
+        <p class="text-xs text-slate-400">High-Accuracy Distributed Map-Matching & Route Reconstruction</p>
+      </div>
+    </div>
+
+    <!-- API Config Connection Pill -->
+    <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 text-xs">
+        <span class="text-slate-400">API Host (Laptop 1):</span>
+        <input id="apiHostInput" type="text" value="http://localhost:8000" class="bg-slate-950 border border-slate-700 px-2 py-0.5 rounded text-slate-200 text-xs w-48 focus:outline-none focus:border-blue-500" />
+        <button id="btnCheckHealth" onclick="checkConnection()" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs transition">Connect</button>
+      </div>
+      <div id="connBadge" class="flex items-center space-x-1.5 text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="connStatusText">Connected</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 flex overflow-hidden">
+    
+    <!-- Left Sidebar: Reserved Evaluation Trips List -->
+    <aside class="w-80 border-r border-slate-800 bg-slate-900/50 flex flex-col p-4 shrink-0 overflow-y-auto">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center space-x-1.5">
+          <i class="ph ph-list-numbers text-sm text-blue-400"></i>
+          <span>Evaluation Trips (10)</span>
+        </h2>
+        <span class="text-[11px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">Select to test</span>
+      </div>
+
+      <!-- Trip Buttons List -->
+      <div id="tripList" class="space-y-2 flex-1">
+        <div class="text-xs text-slate-500 text-center py-8">Loading trips from API...</div>
+      </div>
+
+      <!-- Evaluator Guide Banner -->
+      <div class="mt-4 p-3 bg-slate-800/50 rounded-xl border border-slate-700/60 text-xs space-y-1 text-slate-400">
+        <div class="font-medium text-slate-200 flex items-center space-x-1">
+          <i class="ph ph-shield-check text-emerald-400 text-sm"></i>
+          <span>High-Accuracy Mode (k=20)</span>
+        </div>
+        <p class="text-[11px] leading-relaxed">
+          Spatial candidates expanded to 20 per point (96.4% coverage). Evaluator ground-truth remains strictly protected on Laptop 1.
+        </p>
+      </div>
+    </aside>
+
+    <!-- Center/Right: Results Dashboard & Interactive Folium Map -->
+    <section class="flex-1 flex flex-col bg-slate-950 overflow-y-auto p-6 space-y-6">
+      
+      <!-- Top Metric Cards Bar -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <!-- Card 1: Route Continuity -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+          <div class="text-xs text-slate-400 flex items-center justify-between">
+            <span>Route Continuity</span>
+            <i class="ph ph-path text-blue-400 text-base"></i>
+          </div>
+          <div class="text-2xl font-bold text-white mt-2" id="metricContinuity">--</div>
+          <div class="text-[11px] text-emerald-400 mt-1 flex items-center space-x-1" id="metricContinuityGain">
+            <span>Topological head-to-tail</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Traversed Network Recall / Accuracy -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+          <div class="text-xs text-slate-400 flex items-center justify-between">
+            <span>Route Network Recovery</span>
+            <i class="ph ph-target text-emerald-400 text-base"></i>
+          </div>
+          <div class="text-2xl font-bold text-white mt-2" id="metricAccuracy">--</div>
+          <div class="text-[11px] text-slate-400 mt-1" id="metricBaselineAcc">
+            <span>Traversed road segments</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Candidate Pool Coverage -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+          <div class="text-xs text-slate-400 flex items-center justify-between">
+            <span>Candidate Coverage</span>
+            <i class="ph ph-crosshair-simple text-purple-400 text-base"></i>
+          </div>
+          <div class="text-2xl font-bold text-white mt-2" id="metricCoverage">--</div>
+          <div class="text-[11px] text-slate-400 mt-1" id="metricCandidatePool">
+            <span>k=20 spatial candidate pool</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Pipeline Latency -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+          <div class="text-xs text-slate-400 flex items-center justify-between">
+            <span>Pipeline Latency</span>
+            <i class="ph ph-timer text-amber-400 text-base"></i>
+          </div>
+          <div class="text-2xl font-bold text-white mt-2" id="metricLatency">--</div>
+          <div class="text-[11px] text-slate-400 mt-1" id="metricViterbiTime">
+            <span>Viterbi + HMM</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel & Trip Details -->
+      <div class="flex items-center justify-between bg-slate-900/60 border border-slate-800 rounded-xl px-5 py-3.5">
+        <div class="flex items-center space-x-3">
+          <span class="text-sm text-slate-400">Current Trip:</span>
+          <span id="currentTripLabel" class="text-base font-bold text-blue-400 font-mono tracking-wider">None Selected</span>
+          <span id="tripBadge" class="hidden text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Ready</span>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+          <button id="btnRunPrediction" onclick="runTripPrediction()" disabled class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold flex items-center space-x-2 transition shadow-lg shadow-blue-600/20">
+            <i class="ph ph-play text-sm"></i>
+            <span>Run Reconstruction Pipeline</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Map Frame -->
+      <div class="flex-1 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden flex flex-col min-h-[500px] shadow-2xl relative">
+        <div class="px-4 py-2.5 bg-slate-800/80 border-b border-slate-700 flex items-center justify-between text-xs">
+          <div class="flex items-center space-x-4">
+            <span class="font-medium text-slate-200 flex items-center space-x-1.5">
+              <i class="ph ph-map-pin text-rose-400"></i>
+              <span>Geographical Map Visualization</span>
+            </span>
+            <!-- Map Legend -->
+            <div class="flex items-center space-x-3 text-[11px]">
+              <span class="flex items-center space-x-1">
+                <span class="h-2.5 w-2.5 rounded-full bg-blue-500 inline-block"></span>
+                <span class="text-slate-300">Raw GPS</span>
+              </span>
+              <span class="flex items-center space-x-1">
+                <span class="h-1 w-3 bg-emerald-500 inline-block rounded"></span>
+                <span class="text-slate-300">Ground Truth</span>
+              </span>
+              <span class="flex items-center space-x-1">
+                <span class="h-1 w-3 bg-purple-500 inline-block rounded border-dashed"></span>
+                <span class="text-slate-300">PathSnap Predicted</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="text-slate-400 text-[11px]" id="mapStatusText">
+            Select a trip and click Run Reconstruction
+          </div>
+        </div>
+
+        <!-- Folium Embed iframe -->
+        <iframe id="mapFrame" src="about:blank" class="w-full flex-1 border-0 bg-slate-950"></iframe>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Script for Laptop 2 Evaluator Operations -->
+  <script>
+    let activeTripId = null;
+    let trips = [];
+
+    function getApiHost() {
+      return document.getElementById("apiHostInput").value.trim().replace(/\/$/, "");
+    }
+
+    async function checkConnection() {
+      const host = getApiHost();
+      const statusBadge = document.getElementById("connBadge");
+      const statusText = document.getElementById("connStatusText");
+      
+      try {
+        const res = await fetch(`${host}/`);
+        if (res.ok) {
+          statusBadge.className = "flex items-center space-x-1.5 text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+          statusText.innerText = "Connected";
+          loadTrips();
+        } else {
+          throw new Error("API status " + res.status);
+        }
+      } catch (err) {
+        statusBadge.className = "flex items-center space-x-1.5 text-xs px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20";
+        statusText.innerText = "Offline / Unreachable";
+      }
+    }
+
+    async function loadTrips() {
+      const host = getApiHost();
+      try {
+        const res = await fetch(`${host}/api/trips`);
+        const data = await res.json();
+        trips = data.trips || [];
+        
+        const listContainer = document.getElementById("tripList");
+        listContainer.innerHTML = "";
+        
+        trips.forEach((tid, idx) => {
+          const btn = document.createElement("button");
+          btn.className = "w-full text-left px-3.5 py-2.5 rounded-lg border border-slate-800 hover:border-blue-500/50 bg-slate-800/40 hover:bg-slate-800 text-xs font-mono flex items-center justify-between transition group";
+          btn.id = `btnTrip_${tid}`;
+          btn.onclick = () => selectTrip(tid);
+          
+          btn.innerHTML = `
+            <div class="flex items-center space-x-2">
+              <span class="text-slate-500 group-hover:text-blue-400 font-sans text-[11px]">#${idx+1}</span>
+              <span class="font-semibold text-slate-200 group-hover:text-white">${tid}</span>
+            </div>
+            <i class="ph ph-caret-right text-slate-500 group-hover:text-blue-400 text-sm"></i>
+          `;
+          listContainer.appendChild(btn);
+        });
+
+        if (trips.length > 0) {
+          selectTrip(trips[0]);
+        }
+      } catch (err) {
+        console.error("Failed to load trips:", err);
+      }
+    }
+
+    function selectTrip(tid) {
+      activeTripId = tid;
+      document.getElementById("currentTripLabel").innerText = `Trip #${tid}`;
+      document.getElementById("btnRunPrediction").disabled = false;
+      document.getElementById("tripBadge").classList.remove("hidden");
+      
+      trips.forEach(t => {
+        const el = document.getElementById(`btnTrip_${t}`);
+        if (el) {
+          if (t === tid) {
+            el.className = "w-full text-left px-3.5 py-2.5 rounded-lg border border-blue-500 bg-blue-600/10 text-xs font-mono flex items-center justify-between transition shadow-md shadow-blue-500/10";
+          } else {
+            el.className = "w-full text-left px-3.5 py-2.5 rounded-lg border border-slate-800 hover:border-blue-500/50 bg-slate-800/40 hover:bg-slate-800 text-xs font-mono flex items-center justify-between transition group";
+          }
+        }
+      });
+    }
+
+    async function runTripPrediction() {
+      if (!activeTripId) return;
+      const host = getApiHost();
+      const runBtn = document.getElementById("btnRunPrediction");
+      const mapStatus = document.getElementById("mapStatusText");
+      
+      runBtn.disabled = true;
+      runBtn.innerHTML = `<i class="ph ph-spinner animate-spin text-sm"></i> <span>Reconstructing Route...</span>`;
+      mapStatus.innerText = "Processing trajectory through High-Accuracy HMM Engine on Laptop 1...";
+
+      try {
+        const res = await fetch(`${host}/api/predict/${activeTripId}`, {
+          method: "POST"
+        });
+        const data = await res.json();
+        
+        if (data.status === "success") {
+          const m = data.metrics;
+          document.getElementById("metricContinuity").innerText = `${m.hmm_route_continuity}%`;
+          
+          if (m.route_network_recovery_accuracy !== undefined) {
+            document.getElementById("metricAccuracy").innerText = `${m.route_network_recovery_accuracy}%`;
+            document.getElementById("metricBaselineAcc").innerText = `Ground-truth road segments recovered`;
+          } else {
+            document.getElementById("metricAccuracy").innerText = "Blind Eval";
+            document.getElementById("metricBaselineAcc").innerText = "Server-side restricted";
+          }
+          
+          document.getElementById("metricCoverage").innerText = `${m.candidate_coverage_accuracy}%`;
+          document.getElementById("metricCandidatePool").innerText = `k=20 candidates per observation`;
+
+          document.getElementById("metricLatency").innerText = `${m.total_processing_time_ms} ms`;
+          document.getElementById("metricViterbiTime").innerText = `Viterbi: ${m.viterbi_latency_ms} ms`;
+
+          // Load map into iframe
+          document.getElementById("mapFrame").src = `${host}/api/map/${activeTripId}`;
+          mapStatus.innerText = `Route reconstructed for ${activeTripId} successfully.`;
+        } else {
+          alert("Error: " + (data.detail || "Prediction failed"));
+        }
+      } catch (err) {
+        alert("API request failed: " + err.message);
+      } finally {
+        runBtn.disabled = false;
+        runBtn.innerHTML = `<i class="ph ph-play text-sm"></i> <span>Run Reconstruction Pipeline</span>`;
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      checkConnection();
+    });
+  </script>
+</body>
+</html>

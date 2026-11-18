@@ -1,12 +1,24 @@
 """
-PathSnap Core Utilities: Data loading, spatial projection, geometry, and candidate extraction.
+PathSnap Core Utilities: Data loading, spatial projection, geometry, and rich multi-feature candidate extraction.
+Features per candidate (12 rich geometric and kinematic features):
+  0: perp_distance (m)
+  1: distance_to_midpoint (m)
+  2: heading_difference (deg, [0, 180])
+  3: gps_speed (m/s)
+  4: segment_length (m)
+  5: projection_ratio (t in [0, 1])
+  6: dt (seconds since previous GPS point)
+  7: rank_by_dist (0 to k-1)
+  8: distance_to_node_u (m)
+  9: distance_to_node_v (m)
+ 10: heading_consistency (cos of angular difference [-1, 1])
+ 11: projection_endpoint_penalty (|t - 0.5| * 2 in [0, 1])
 """
 import os
 import math
 import numpy as np
 from scipy.spatial import cKDTree
 
-# Projection constants for Germany Darmstadt region (lat ~ 49.85, lon ~ 8.58)
 M_PER_DEG_LAT = 111320.0
 
 def get_meter_projection(lat_center=49.85):
@@ -15,9 +27,6 @@ def get_meter_projection(lat_center=49.85):
     return m_per_deg_lon, M_PER_DEG_LAT
 
 def load_trip_data(trip_dir, trip_id, load_route=True):
-    """
-    Loads nodes, arcs, track, and optionally route for a given trip.
-    """
     p = os.path.join(trip_dir, trip_id, trip_id)
     nodes = np.loadtxt(f"{p}.nodes")
     arcs = np.loadtxt(f"{p}.arcs", dtype=int)
@@ -39,10 +48,6 @@ def load_trip_data(trip_dir, trip_id, load_route=True):
     }
 
 def get_observation_ground_truth(trip_data):
-    """
-    Projects GPS track points chronologically onto the ground-truth route sequence
-    to determine the reference arc_id traversed at each GPS observation point.
-    """
     track = trip_data["track"]
     route = trip_data["route"]
     arcs = trip_data["arcs"]
@@ -73,7 +78,7 @@ def get_observation_ground_truth(trip_data):
     for i in range(len(track)):
         p_x, p_y = px[i], py[i]
         w_start = max(0, curr_r - 1)
-        w_end = min(len(route), curr_r + 25)
+        w_end = min(len(route), curr_r + 30)
         
         t_param = np.clip(((p_x - ax[w_start:w_end])*dx[w_start:w_end] + 
                            (p_y - ay[w_start:w_end])*dy[w_start:w_end]) / l2[w_start:w_end], 0.0, 1.0)
@@ -88,11 +93,7 @@ def get_observation_ground_truth(trip_data):
     return true_arcs
 
 def build_road_spatial_index(nodes, arcs, lat_center=49.85):
-    """
-    Builds spatial index and vectorized segment data for fast candidate querying.
-    """
     m_lon, m_lat = get_meter_projection(lat_center)
-    
     u_idx = arcs[:, 0]
     v_idx = arcs[:, 1]
     
@@ -125,19 +126,7 @@ def build_road_spatial_index(nodes, arcs, lat_center=49.85):
         "num_arcs": len(arcs)
     }
 
-def extract_candidates_and_features(trip_data, road_index=None, k_candidates=8, true_arcs=None):
-    """
-    For every GPS point in trip_data, query top-k candidate arcs and compute engineered features.
-    Features per candidate:
-      0: perp_distance (m)
-      1: distance_to_midpoint (m)
-      2: heading_difference (deg, [0, 180])
-      3: speed_ms (m/s)
-      4: segment_length (m)
-      5: projection_ratio (t in [0, 1])
-      6: dt (seconds since previous GPS point)
-      7: rank_by_dist (0 to k-1)
-    """
+def extract_candidates_and_features(trip_data, road_index=None, k_candidates=20, true_arcs=None):
     track = trip_data["track"]
     N = len(track)
     if road_index is None:
@@ -153,9 +142,9 @@ def extract_candidates_and_features(trip_data, road_index=None, k_candidates=8, 
     nn_dists, cand_matrix = road_index["tree"].query(np.column_stack([px, py]), k=k_candidates)
     
     # Calculate GPS speed and heading
-    gps_speed = np.zeros(N)
-    gps_heading = np.zeros(N)
-    dt = np.ones(N)
+    gps_speed = np.zeros(N, dtype=np.float32)
+    gps_heading = np.zeros(N, dtype=np.float32)
+    dt = np.ones(N, dtype=np.float32)
     
     for i in range(1, N):
         disp_x = px[i] - px[i-1]
@@ -170,7 +159,6 @@ def extract_candidates_and_features(trip_data, road_index=None, k_candidates=8, 
     
     feature_list = []
     labels = [] if true_arcs is not None else None
-    meta = []
     
     ax = road_index["ax"]
     ay = road_index["ay"]
@@ -198,9 +186,15 @@ def extract_candidates_and_features(trip_data, road_index=None, k_candidates=8, 
         perp_dist = np.hypot(px[i] - proj_x, py[i] - proj_y)
         mid_dist = nn_dists[i]
         
-        # heading diff
+        # Dist to endpoints
+        dist_u = np.hypot(px[i] - c_ax, py[i] - c_ay)
+        dist_v = np.hypot(px[i] - c_bx, py[i] - c_by)
+        
+        # Angular diff & cosine consistency
         h_diff = np.abs(gps_heading[i] - arc_hd[cands_i])
         h_diff = np.minimum(h_diff, 360.0 - h_diff)
+        cos_align = np.cos(np.radians(h_diff))
+        endpoint_penalty = np.abs(t_param - 0.5) * 2.0
         
         # Rank by perp_dist
         rank_order = np.argsort(perp_dist)
@@ -217,24 +211,25 @@ def extract_candidates_and_features(trip_data, road_index=None, k_candidates=8, 
                 arc_len[c_id],
                 t_param[k_idx],
                 dt[i],
-                ranks[k_idx]
+                ranks[k_idx],
+                dist_u[k_idx],
+                dist_v[k_idx],
+                cos_align[k_idx],
+                endpoint_penalty[k_idx]
             ]
             feature_list.append(feat)
-            meta.append((i, c_id, perp_dist[k_idx]))
             
             if true_arcs is not None:
                 is_match = 1 if (c_id == true_arcs[i]) else 0
                 labels.append(is_match)
                 
     features = np.array(feature_list, dtype=np.float32)
-    meta = np.array(meta, dtype=object)
     if labels is not None:
         labels = np.array(labels, dtype=int)
         
     return {
         "features": features,
         "labels": labels,
-        "meta": meta, # (obs_idx, arc_id, perp_dist)
         "cand_matrix": cand_matrix,
         "num_obs": N,
         "k_candidates": k_candidates

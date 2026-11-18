@@ -1,0 +1,117 @@
+{
+  "mean_topological_continuity": 0.9817915592961854,
+  "mean_route_arc_recovery": 0.9235918115451518,
+  "mean_observation_accuracy": 0.7714166067002368,
+  "trip_results": [
+    {
+      "trip_id": "00000015",
+      "num_obs": 6854,
+      "gt_route_length": 136,
+      "hmm_continuity": 0.9986867065518751,
+      "clf_continuity": 0.9141981613891726,
+      "route_network_recovery": 0.9926470588235294,
+      "hmm_acc": 0.4538955354537496,
+      "clf_acc": 0.4864312810037934,
+      "latency_ms": 1888.392448425293
+    },
+    {
+      "trip_id": "00000017",
+      "num_obs": 1346,
+      "gt_route_length": 716,
+      "hmm_continuity": 0.9576208178438662,
+      "clf_continuity": 0.7888475836431227,
+      "route_network_recovery": 0.8533519553072626,
+      "hmm_acc": 0.8283803863298663,
+      "clf_acc": 0.8528974739970282,
+      "latency_ms": 590.3878211975098
+    },
+    {
+      "trip_id": "00000023",
+      "num_obs": 458,
+      "gt_route_length": 59,
+      "hmm_continuity": 0.9715536105032823,
+      "clf_continuity": 0.8840262582056893,
+      "route_network_recovery": 0.8983050847457628,
+      "hmm_acc": 0.7270742358078602,
+      "clf_acc": 0.7248908296943232,
+      "latency_ms": 230.94820976257324
+    },
+    {
+      "trip_id": "00000030",
+      "num_obs": 654,
+      "gt_route_length": 337,
+      "hmm_continuity": 0.9571209800918836,
+      "clf_continuity": 0.7580398162327718,
+      "route_network_recovery": 0.7210682492581603,
+      "hmm_acc": 0.7385321100917431,
+      "clf_acc": 0.7477064220183486,
+      "latency_ms": 267.9460048675537
+    },
+    {
+      "trip_id": "00000049",
+      "num_obs": 2642,
+      "gt_route_length": 410,
+      "hmm_continuity": 0.993563044301401,
+      "clf_continuity": 0.9473684210526315,
+      "route_network_recovery": 0.9926829268292683,
+      "hmm_acc": 0.9174867524602573,
+      "clf_acc": 0.9258137774413323,
+      "latency_ms": 863.3599281311035
+    },
+    {
+      "trip_id": "00000059",
+      "num_obs": 1031,
+      "gt_route_length": 455,
+      "hmm_continuity": 0.9689320388349515,
+      "clf_continuity": 0.8368932038834952,
+      "route_network_recovery": 0.8527472527472527,
+      "hmm_acc": 0.8331716779825412,
+      "clf_acc": 0.8593598448108632,
+      "latency_ms": 413.76233100891113
+    },
+    {
+      "trip_id": "00000067",
+      "num_obs": 916,
+      "gt_route_length": 82,
+      "hmm_continuity": 1.0,
+      "clf_continuity": 0.9398907103825137,
+      "route_network_recovery": 1.0,
+      "hmm_acc": 0.6855895196506551,
+      "clf_acc": 0.6975982532751092,
+      "latency_ms": 265.9621238708496
+    },
+    {
+      "trip_id": "00000073",
+      "num_obs": 1144,
+      "gt_route_length": 237,
+      "hmm_continuity": 0.994750656167979,
+      "clf_continuity": 0.9247594050743657,
+      "route_network_recovery": 0.9873417721518988,
+      "hmm_acc": 0.8968531468531469,
+      "clf_acc": 0.8898601398601399,
+      "latency_ms": 577.6097774505615
+    },
+    {
+      "trip_id": "00000087",
+      "num_obs": 1399,
+      "gt_route_length": 455,
+      "hmm_continuity": 0.9849785407725322,
+      "clf_continuity": 0.8919885550786838,
+      "route_network_recovery": 0.9692307692307692,
+      "hmm_acc": 0.9170836311651179,
+      "clf_acc": 0.8870621872766261,
+      "latency_ms": 722.083330154419
+    },
+    {
+      "trip_id": "00000094",
+      "num_obs": 3230,
+      "gt_route_length": 604,
+      "hmm_continuity": 0.9907091978940848,
+      "clf_continuity": 0.8665221430783524,
+      "route_network_recovery": 0.9685430463576159,
+      "hmm_acc": 0.7160990712074303,
+      "clf_acc": 0.7464396284829722,
+      "latency_ms": 994.6575164794922
+    }
+  ]
+}
